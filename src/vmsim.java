@@ -54,6 +54,11 @@ public class vmsim {
             sim_nru(numFrames, refresh, traceFile);
         } else if(algType.equalsIgnoreCase("random")){
             sim_random(numFrames, traceFile);
+            System.out.println("Algorithm: " + algType);
+            System.out.println("Number of frames: " + numFrames);
+            System.out.println("Total memory accesses: " + memAccess);
+            System.out.println("Total memory page faults: " + pageFaults);
+            System.out.println("Total writes to disk: " + wtd);
         } else {
 	    System.out.println("Invalid Algorithm: Choose either Opt, Clock, NRU or Random.");
 	}
@@ -88,11 +93,15 @@ public class vmsim {
             long intAddy = Long.decode(parseAddy);
             int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
-            if(pageTable.containsKey(pageNum) == false) {
-                currentEntry.setIndex(pageNum);
-                pageTable.put(pageNum, currentEntry);
+            if(pageTable.size() < (int)Math.pow(2,32)/(int)Math.pow(2,12)) {
+                if (pageTable.containsKey(pageNum) == false) {
+                    currentEntry = new PTE();
+                    currentEntry.setIndex(pageNum);
+                    pageTable.put(pageNum, currentEntry);
+                }
             }
-            if(!currentEntry.isPresent()) {
+
+            if(currentEntry.isPresent() == false) {
                 pageFaults++;
                 memAccess++;;
 
@@ -116,9 +125,15 @@ public class vmsim {
                         wtd++;
                     }
                 }
+            } else {
+                memAccess++;
+                if (accessType == 'W') {
+                    RAM[usedFrames].setDirty(true);
+                }
             }
 
         }
+
 	
 
     }

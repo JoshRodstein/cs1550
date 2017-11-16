@@ -69,10 +69,7 @@ public class vmsim {
     public static void sim_random(int noFrames, File traceFile){
         int freeFrames = noFrames;
 	    Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
-	    int[] RAM = new int[noFrames];
-	    for(int i = 0; i < RAM.length; i++){
-	        RAM[i] = -1;
-        }
+	    PTE[] RAM = new PTE[noFrames];
 	    Random rand = new Random();
 	    Scanner scan;
 
@@ -90,28 +87,41 @@ public class vmsim {
             String parseAddy = "0x" + trace.substring(0, 8);
             long intAddy = Long.decode(parseAddy);
             int pageNum = (int)intAddy/(int)Math.pow(2,12);
-
+            //System.out.println(pageNum);
             memAccess++;
 
-            if(!pageTable.containsKey(pageNum)){
+            if(pageTable.containsKey(pageNum) == false){
                 PTE currentEntry = new PTE();
                 pageTable.put(pageNum, currentEntry);
 
                 if (freeFrames > 0) {
                     for (int i = 0; i < RAM.length; i++) {
-                        if (RAM[i] == -1) {
-                            RAM[i] = pageNum;
+                        if (RAM[i] == null) {
                             currentEntry.setFrameNumber(i);
                             currentEntry.setReferenced(true);
                             currentEntry.setPresent(true);
+                            currentEntry.setIndex(pageNum);
+                            System.out.println(currentEntry.getIndex());
                             if (accessType == 'w') {
                                 currentEntry.setDirty(true);
                             }
+                            RAM[i] = currentEntry;
+                            System.out.println(RAM[i].getIndex());
                             freeFrames--;
+                            break;
                         }
                     }
                 } else {
+                    pageFaults++;
                     int randomFrame = rand.nextInt(noFrames);
+                    int evictIndex = RAM[randomFrame].getIndex();
+                    System.out.println(evictIndex + " " + randomFrame);
+                    pageTable.get(evictIndex).setPresent(false);
+                    if(pageTable.get(evictIndex).isDirty()){
+                        wtd++;
+                        pageTable.get(evictIndex).setDirty(false);
+                        pageTable.get(evictIndex).setFrameNumber(-1);
+                    }
                 }
 
 

@@ -67,7 +67,7 @@ public class vmsim {
     public static void sim_nru(int noFrames, int refresh, File traceFile){}
 
     public static void sim_random(int noFrames, File traceFile){
-        int freeFrames = noFrames;
+        int usedFrames = 0;
 	    Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
 	    PTE[] RAM = new PTE[noFrames];
 	    Random rand = new Random();
@@ -80,59 +80,45 @@ public class vmsim {
 	        return;
 	    }
 
-
+        PTE currentEntry = new PTE();
 	    while(scan.hasNextLine()){
 	        String trace = scan.nextLine();
             char accessType = trace.charAt(9);
             String parseAddy = "0x" + trace.substring(0, 8);
             long intAddy = Long.decode(parseAddy);
             int pageNum = (int)intAddy/(int)Math.pow(2,12);
-            //System.out.println(pageNum);
-            memAccess++;
 
-            if(pageTable.containsKey(pageNum) == false){
-                PTE currentEntry = new PTE();
+            if(pageTable.containsKey(pageNum) == false) {
+                currentEntry.setIndex(pageNum);
                 pageTable.put(pageNum, currentEntry);
+            }
+            if(!currentEntry.isPresent()) {
+                pageFaults++;
+                memAccess++;;
 
-                if (freeFrames > 0) {
-                    for (int i = 0; i < RAM.length; i++) {
-                        if (RAM[i] == null) {
-                            currentEntry.setFrameNumber(i);
-                            currentEntry.setReferenced(true);
-                            currentEntry.setPresent(true);
-                            currentEntry.setIndex(pageNum);
-                            System.out.println(currentEntry.getIndex());
-                            if (accessType == 'w') {
-                                currentEntry.setDirty(true);
-                            }
-                            RAM[i] = currentEntry;
-                            System.out.println(RAM[i].getIndex());
-                            freeFrames--;
-                            break;
-                        }
+                if (usedFrames < noFrames) {
+                    RAM[usedFrames] = currentEntry;
+                    RAM[usedFrames].setFrameNumber(usedFrames);
+                    RAM[usedFrames].setReferenced(true);
+                    RAM[usedFrames].setPresent(true);
+                    if (accessType == 'W') {
+                        RAM[usedFrames].setDirty(true);
                     }
+                    usedFrames++;
                 } else {
-                    pageFaults++;
                     int randomFrame = rand.nextInt(noFrames);
                     int evictIndex = RAM[randomFrame].getIndex();
                     System.out.println(evictIndex + " " + randomFrame);
                     pageTable.get(evictIndex).setPresent(false);
-                    if(pageTable.get(evictIndex).isDirty()){
-                        wtd++;
+                    if (pageTable.get(evictIndex).isDirty()) {
                         pageTable.get(evictIndex).setDirty(false);
                         pageTable.get(evictIndex).setFrameNumber(-1);
+                        wtd++;
                     }
                 }
-
-
-            } else {
-                PTE currentEntry = pageTable.get(pageNum);
-
             }
 
-
-
-	    }
+        }
 	
 
     }

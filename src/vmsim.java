@@ -44,7 +44,7 @@ public class vmsim {
 
         }
 
-        System.out.println("Number of frames: " + numFrames + " ,Algorithm Choice: " + algType + " ,Refesh Number: " + refresh + " :");
+        System.out.println("Number of frames: " + numFrames + " ,Algorithm Choice: " + algType + " ,Refesh Number: " + refresh + " \n");
 
         if(algType.equalsIgnoreCase("opt")){
             sim_optimum(numFrames, traceFile);
@@ -85,7 +85,7 @@ public class vmsim {
 	        return;
 	    }
 
-        PTE currentEntry = new PTE();
+        PTE currentEntry;
 	    while(scan.hasNextLine()){
 	        String trace = scan.nextLine();
             char accessType = trace.charAt(9);
@@ -93,18 +93,18 @@ public class vmsim {
             long intAddy = Long.decode(parseAddy);
             int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
-            if(pageTable.size() < (int)Math.pow(2,32)/(int)Math.pow(2,12)) {
-                if (pageTable.containsKey(pageNum) == false) {
-                    currentEntry = new PTE();
-                    currentEntry.setIndex(pageNum);
-                    pageTable.put(pageNum, currentEntry);
-                }
+            if (pageTable.containsKey(pageNum) == false) {
+                PTE newEntry = new PTE();
+                newEntry.setIndex(pageNum);
+                pageTable.put(pageNum, newEntry);
+                currentEntry = newEntry;
+            } else {
+                currentEntry = pageTable.get(pageNum);
             }
 
+            memAccess++;
             if(currentEntry.isPresent() == false) {
                 pageFaults++;
-                memAccess++;;
-
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
                     RAM[usedFrames].setFrameNumber(usedFrames);
@@ -117,25 +117,26 @@ public class vmsim {
                 } else {
                     int randomFrame = rand.nextInt(noFrames);
                     int evictIndex = RAM[randomFrame].getIndex();
-                    System.out.println(evictIndex + " " + randomFrame);
                     pageTable.get(evictIndex).setPresent(false);
                     if (pageTable.get(evictIndex).isDirty()) {
                         pageTable.get(evictIndex).setDirty(false);
                         pageTable.get(evictIndex).setFrameNumber(-1);
                         wtd++;
                     }
+                    RAM[randomFrame] = currentEntry;
+                    RAM[randomFrame].setFrameNumber(randomFrame);
+                    RAM[randomFrame].setReferenced(true);
+                    RAM[randomFrame].setPresent(true);
+                    if (accessType == 'W') {
+                        RAM[randomFrame].setDirty(true);
+                    }
                 }
             } else {
-                memAccess++;
                 if (accessType == 'W') {
-                    RAM[usedFrames].setDirty(true);
+                    RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
             }
-
         }
-
-	
-
     }
 
 

@@ -2,11 +2,11 @@ import java.util.*;
 
 public class PTE {
 
-    private static boolean dirty;
-    private static boolean referenced;
-    private static boolean present;
-    private static int ptIndex;
-    private static int frameNumber;
+    private boolean dirty;
+    private boolean referenced;
+    private boolean present;
+    private int ptIndex;
+    private int frameNumber;
 
     public PTE() {
 	this.dirty = false;

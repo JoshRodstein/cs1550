@@ -2,9 +2,9 @@ import java.io.*;
 import java.util.*;
 
 public class vmsim {
-    public int memAccess;
-    public int pageFaults;
-    public int wtd;
+    public static int memAccess;
+    public static int pageFaults;
+    public static int wtd;
     
     
     public vmsim(){
@@ -65,23 +65,64 @@ public class vmsim {
     public static void sim_optimum(int nofFrames, File traceFile){}
     public static void sim_clock(int noFrames, File traceFile){}
     public static void sim_nru(int noFrames, int refresh, File traceFile){}
+
     public static void sim_random(int noFrames, File traceFile){
-	Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
-	int[] RAM = new int[noFrames];
-	Random rand = new Random();
-	Scanner scan;
+        int freeFrames = noFrames;
+	    Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
+	    int[] RAM = new int[noFrames];
+	    for(int i = 0; i < RAM.length; i++){
+	        RAM[i] = -1;
+        }
+	    Random rand = new Random();
+	    Scanner scan;
 
-	try {
-	    scan = new Scanner(traceFile);
-	} catch(FileNotFoundException fn) {
-	    System.out.println("File not found");
-	    return;
-	}
+	    try {
+	        scan = new Scanner(traceFile);
+	    } catch(FileNotFoundException fn) {
+	        System.out.println("File not found");
+	        return;
+	    }
 
-	
-	while(scan.hasNextLine()){
 
-	}
+	    while(scan.hasNextLine()){
+	        String trace = scan.nextLine();
+            char accessType = trace.charAt(9);
+            String parseAddy = "0x" + trace.substring(0, 8);
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
+
+            memAccess++;
+
+            if(!pageTable.containsKey(pageNum)){
+                PTE currentEntry = new PTE();
+                pageTable.put(pageNum, currentEntry);
+
+                if (freeFrames > 0) {
+                    for (int i = 0; i < RAM.length; i++) {
+                        if (RAM[i] == -1) {
+                            RAM[i] = pageNum;
+                            currentEntry.setFrameNumber(i);
+                            currentEntry.setReferenced(true);
+                            currentEntry.setPresent(true);
+                            if (accessType == 'w') {
+                                currentEntry.setDirty(true);
+                            }
+                            freeFrames--;
+                        }
+                    }
+                } else {
+                    int randomFrame = rand.nextInt(noFrames);
+                }
+
+
+            } else {
+                PTE currentEntry = pageTable.get(pageNum);
+
+            }
+
+
+
+	    }
 	
 
     }

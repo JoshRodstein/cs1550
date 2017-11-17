@@ -16,7 +16,7 @@ public class vmsim {
     public static void main(String[] args) {
         int numFrames = 0;
         String algType = "";
-        int refresh = 0;
+        int refresh = -1;
         File traceFile = null;
 
         for(int i = 0; i < args.length; i++){
@@ -48,33 +48,28 @@ public class vmsim {
 
         if(algType.equalsIgnoreCase("opt")){
             sim_optimum(numFrames, traceFile);
+            printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
         } else if(algType.equalsIgnoreCase("clock")) {
             sim_clock(numFrames, traceFile);
+            printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
         } else if(algType.equalsIgnoreCase("nru")){
             sim_nru(numFrames, refresh, traceFile);
-            System.out.println("Algorithm: " + algType);
-            System.out.println("Number of frames: " + numFrames);
-            System.out.println("Refresh rate: " + refresh);
-            System.out.println("Total memory accesses: " + memAccess);
-            System.out.println("Total memory page faults: " + pageFaults);
-            System.out.println("Total writes to disk: " + wtd);
+            printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
         } else if(algType.equalsIgnoreCase("random")){
             sim_random(numFrames, traceFile);
-            System.out.println("Algorithm: " + algType);
-            System.out.println("Number of frames: " + numFrames);
-            System.out.println("Total memory accesses: " + memAccess);
-            System.out.println("Total memory page faults: " + pageFaults);
-            System.out.println("Total writes to disk: " + wtd);
+            printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
         } else {
-	    System.out.println("Invalid Algorithm: Choose either Opt, Clock, NRU or Random.");
-	}
+	        System.out.println("Invalid Algorithm: Choose either Opt, Clock, NRU or Random.");
+	    }
 
 	System.exit(0);
 
     }
 
     public static void sim_optimum(int nofFrames, File traceFile){}
-    public static void sim_clock(int noFrames, File traceFile){}
+    public static void sim_clock(int noFrames, File traceFile){
+
+    }
     public static void sim_nru(int noFrames, int refresh, File traceFile){
         int usedFrames = 0;
         Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
@@ -177,11 +172,10 @@ public class vmsim {
                         RAM[i].setReferenced(false);
                     }
                 }
-                //System.out.println("refresh");
+
             }
         }
     }
-
     public static void sim_random(int noFrames, File traceFile){
         int usedFrames = 0;
 	    Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
@@ -246,6 +240,17 @@ public class vmsim {
                 }
             }
         }
+    }
+
+    public static void printResults(String algType, int numFrames, int refresh, int memAccess, int pageFaults, int wtd){
+        System.out.println("Algorithm: " + algType);
+        System.out.println("Number of frames: " + numFrames);
+        if(refresh >= 0 && algType.equalsIgnoreCase("nru")){
+            System.out.println("Refresh rate: " + refresh);
+        }
+        System.out.println("Total memory accesses: " + memAccess);
+        System.out.println("Total memory page faults: " + pageFaults);
+        System.out.println("Total writes to disk: " + wtd);
     }
 
 

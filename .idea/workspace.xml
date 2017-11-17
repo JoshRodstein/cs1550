@@ -20,15 +20,17 @@
           <file leaf-file-name="vmsim.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/vmsim.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="810">
-                  <caret line="150" column="71" lean-forward="false" selection-start-line="150" selection-start-column="71" selection-end-line="150" selection-end-column="71" />
+                <state relative-caret-position="324">
+                  <caret line="70" column="62" lean-forward="false" selection-start-line="70" selection-start-column="62" selection-end-line="70" selection-end-column="62" />
                   <folding>
                     <element signature="imports" expanded="true" />
+                    <element signature="method#main#0;class#vmsim#0" expanded="false" />
+                    <element signature="method#sim_clock#0;class#vmsim#0" expanded="false" />
                     <element signature="e#2446#2460#0" expanded="true" />
                     <element signature="method#sim_nru#0;class#vmsim#0" expanded="false" />
-                    <element signature="e#5689#5703#0" expanded="true" />
+                    <element signature="e#5771#5785#0" expanded="true" />
                     <element signature="method#sim_random#0;class#vmsim#0" expanded="false" />
-                    <element signature="e#9706#9720#0" expanded="true" />
+                    <element signature="e#9944#9958#0" expanded="true" />
                     <element signature="method#printResults#0;class#vmsim#0" expanded="false" />
                   </folding>
                 </state>
@@ -278,7 +280,7 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3241309" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3241309" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -303,7 +305,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <option name="time" value="4" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -314,11 +316,13 @@
           <caret line="131" column="17" lean-forward="false" selection-start-line="131" selection-start-column="17" selection-end-line="131" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#vmsim#0" expanded="false" />
+            <element signature="method#sim_clock#0;class#vmsim#0" expanded="false" />
             <element signature="e#2446#2460#0" expanded="true" />
             <element signature="method#sim_nru#0;class#vmsim#0" expanded="false" />
-            <element signature="e#5689#5703#0" expanded="true" />
+            <element signature="e#5771#5785#0" expanded="true" />
             <element signature="method#sim_random#0;class#vmsim#0" expanded="false" />
-            <element signature="e#9706#9720#0" expanded="true" />
+            <element signature="e#9944#9958#0" expanded="true" />
             <element signature="method#printResults#0;class#vmsim#0" expanded="false" />
           </folding>
         </state>
@@ -349,15 +353,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/vmsim.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="810">
-          <caret line="150" column="71" lean-forward="false" selection-start-line="150" selection-start-column="71" selection-end-line="150" selection-end-column="71" />
+        <state relative-caret-position="324">
+          <caret line="70" column="62" lean-forward="false" selection-start-line="70" selection-start-column="62" selection-end-line="70" selection-end-column="62" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#vmsim#0" expanded="false" />
+            <element signature="method#sim_clock#0;class#vmsim#0" expanded="false" />
             <element signature="e#2446#2460#0" expanded="true" />
             <element signature="method#sim_nru#0;class#vmsim#0" expanded="false" />
-            <element signature="e#5689#5703#0" expanded="true" />
+            <element signature="e#5771#5785#0" expanded="true" />
             <element signature="method#sim_random#0;class#vmsim#0" expanded="false" />
-            <element signature="e#9706#9720#0" expanded="true" />
+            <element signature="e#9944#9958#0" expanded="true" />
             <element signature="method#printResults#0;class#vmsim#0" expanded="false" />
           </folding>
         </state>

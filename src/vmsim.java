@@ -125,12 +125,11 @@ public class vmsim {
                             RAM[clockHand].setReferenced(false);
                             clockHand++;
                         }
-
                     }
-
 
                     int evictIndex = RAM[evictFrame].getIndex();
                     pageTable.get(evictIndex).setPresent(false);
+                    pageTable.get(RAM[evictFrame].getIndex()).setReferenced(false);
                     pageTable.get(evictIndex).setFrameNumber(-1);
 
                     if (pageTable.get(evictIndex).isDirty()) {
@@ -227,6 +226,7 @@ public class vmsim {
                     int randomFrame = rand.nextInt(nruClass[lnec].size());
                     int evictFrame = nruClass[lnec].get(randomFrame);
                     pageTable.get(RAM[evictFrame].getIndex()).setPresent(false);
+                    pageTable.get(RAM[evictFrame].getIndex()).setReferenced(false);
                     pageTable.get(RAM[evictFrame].getIndex()).setFrameNumber(-1);
 
                     if (pageTable.get(RAM[evictFrame].getIndex()).isDirty()) {
@@ -245,6 +245,7 @@ public class vmsim {
                 if (accessType == 'W') {
                     currentEntry.setDirty(true);
                 }
+                RAM[currentEntry.getFrameNumber()].setReferenced(true);
             }
 
 
@@ -320,6 +321,7 @@ public class vmsim {
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
+                RAM[currentEntry.getFrameNumber()].setReferenced(true);
             }
         }
     }

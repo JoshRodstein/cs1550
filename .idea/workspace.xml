@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f9b7e2a5-3794-430a-9416-28fa604344cb" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/vmsim.java" afterPath="$PROJECT_DIR$/src/vmsim.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -19,15 +20,15 @@
           <file leaf-file-name="vmsim.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/vmsim.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="670">
-                  <caret line="120" column="40" lean-forward="false" selection-start-line="120" selection-start-column="40" selection-end-line="120" selection-end-column="40" />
+                <state relative-caret-position="810">
+                  <caret line="150" column="71" lean-forward="false" selection-start-line="150" selection-start-column="71" selection-end-line="150" selection-end-column="71" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#2446#2460#0" expanded="true" />
                     <element signature="method#sim_nru#0;class#vmsim#0" expanded="false" />
-                    <element signature="e#5554#5568#0" expanded="true" />
+                    <element signature="e#5689#5703#0" expanded="true" />
                     <element signature="method#sim_random#0;class#vmsim#0" expanded="false" />
-                    <element signature="e#9571#9585#0" expanded="true" />
+                    <element signature="e#9706#9720#0" expanded="true" />
                     <element signature="method#printResults#0;class#vmsim#0" expanded="false" />
                   </folding>
                 </state>
@@ -315,9 +316,9 @@
             <element signature="imports" expanded="true" />
             <element signature="e#2446#2460#0" expanded="true" />
             <element signature="method#sim_nru#0;class#vmsim#0" expanded="false" />
-            <element signature="e#5554#5568#0" expanded="true" />
+            <element signature="e#5689#5703#0" expanded="true" />
             <element signature="method#sim_random#0;class#vmsim#0" expanded="false" />
-            <element signature="e#9571#9585#0" expanded="true" />
+            <element signature="e#9706#9720#0" expanded="true" />
             <element signature="method#printResults#0;class#vmsim#0" expanded="false" />
           </folding>
         </state>
@@ -348,15 +349,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/vmsim.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="670">
-          <caret line="120" column="40" lean-forward="false" selection-start-line="120" selection-start-column="40" selection-end-line="120" selection-end-column="40" />
+        <state relative-caret-position="810">
+          <caret line="150" column="71" lean-forward="false" selection-start-line="150" selection-start-column="71" selection-end-line="150" selection-end-column="71" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2446#2460#0" expanded="true" />
             <element signature="method#sim_nru#0;class#vmsim#0" expanded="false" />
-            <element signature="e#5554#5568#0" expanded="true" />
+            <element signature="e#5689#5703#0" expanded="true" />
             <element signature="method#sim_random#0;class#vmsim#0" expanded="false" />
-            <element signature="e#9571#9585#0" expanded="true" />
+            <element signature="e#9706#9720#0" expanded="true" />
             <element signature="method#printResults#0;class#vmsim#0" expanded="false" />
           </folding>
         </state>

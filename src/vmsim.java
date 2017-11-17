@@ -87,7 +87,7 @@ public class vmsim {
         while(scan.hasNextLine()){
             String trace = scan.nextLine();
             char accessType = trace.charAt(9);
-            String parseAddy = "0x" + trace.substring(0, 8);
+            String parseAddy = "0x" + trace.substring(0,8);
             long intAddy = Long.decode(parseAddy);
             int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
@@ -117,6 +117,7 @@ public class vmsim {
                             clockHand = 0;
                         }
                         if(RAM[clockHand].isReferenced() == false){
+                            RAM[clockHand].setReferenced(true);
                             evictFrame = clockHand;
                             clockHand++;
                             break;
@@ -147,6 +148,7 @@ public class vmsim {
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
+                RAM[currentEntry.getFrameNumber()].setReferenced(true);
             }
         }
     }

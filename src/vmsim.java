@@ -44,7 +44,8 @@ public class vmsim {
 
         }
 
-        System.out.println("Number of frames: " + numFrames + " ,Algorithm Choice: " + algType + " ,Refesh Number: " + refresh + " \n");
+        System.out.println("Number of frames: " + numFrames + " ,Algorithm Choice: " + algType +
+                " ,Refesh Number: " + refresh + " \n");
 
         if(algType.equalsIgnoreCase("opt")){
             sim_optimum(numFrames, traceFile);
@@ -68,7 +69,86 @@ public class vmsim {
 
     public static void sim_optimum(int nofFrames, File traceFile){}
     public static void sim_clock(int noFrames, File traceFile){
+        int usedFrames = 0;
+        Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
+        PTE[] RAM = new PTE[noFrames];
+        Random rand = new Random();
+        Scanner scan;
+        int clockHand = 0;
 
+        try {
+            scan = new Scanner(traceFile);
+        } catch(FileNotFoundException fn) {
+            System.out.println("File not found");
+            return;
+        }
+
+        PTE currentEntry;
+        while(scan.hasNextLine()){
+            String trace = scan.nextLine();
+            char accessType = trace.charAt(9);
+            String parseAddy = "0x" + trace.substring(0, 8);
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
+
+            if (pageTable.containsKey(pageNum) == false) {
+                PTE newEntry = new PTE();
+                newEntry.setIndex(pageNum);
+                pageTable.put(pageNum, newEntry);
+                currentEntry = newEntry;
+            } else {
+                currentEntry = pageTable.get(pageNum);
+            }
+
+            memAccess++;
+            if(currentEntry.isPresent() == false) {
+                pageFaults++;
+                if (usedFrames < noFrames) {
+                    RAM[usedFrames] = currentEntry;
+                    RAM[usedFrames].setFrameNumber(usedFrames);
+                    RAM[usedFrames].setReferenced(true);
+                    RAM[usedFrames].setPresent(true);
+                    if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
+                    usedFrames++;
+                } else {
+                    int evictFrame;
+                    while(true){
+                        if(clockHand == 8){
+                            clockHand = 0;
+                        }
+                        if(RAM[clockHand].isReferenced() == false){
+                            evictFrame = clockHand;
+                            clockHand++;
+                            break;
+                        } else {
+                            RAM[clockHand].setReferenced(false);
+                            clockHand++;
+                        }
+
+                    }
+
+
+                    int evictIndex = RAM[evictFrame].getIndex();
+                    pageTable.get(evictIndex).setPresent(false);
+                    pageTable.get(evictIndex).setFrameNumber(-1);
+
+                    if (pageTable.get(evictIndex).isDirty()) {
+                        pageTable.get(evictIndex).setDirty(false);
+                        wtd++;
+                    }
+
+                    RAM[evictFrame] = currentEntry;
+                    RAM[evictFrame].setFrameNumber(evictFrame);
+                    RAM[evictFrame].setReferenced(true);
+                    RAM[evictFrame].setPresent(true);
+                    if (accessType == 'W') { RAM[evictFrame].setDirty(true); }
+                }
+            } else {
+                if (accessType == 'W') {
+                    RAM[currentEntry.getFrameNumber()].setDirty(true);
+                }
+            }
+        }
     }
     public static void sim_nru(int noFrames, int refresh, File traceFile){
         int usedFrames = 0;
@@ -242,7 +322,8 @@ public class vmsim {
         }
     }
 
-    public static void printResults(String algType, int numFrames, int refresh, int memAccess, int pageFaults, int wtd){
+    public static void printResults(String algType, int numFrames, int refresh,
+                                    int memAccess, int pageFaults, int wtd){
         System.out.println("Algorithm: " + algType);
         System.out.println("Number of frames: " + numFrames);
         if(refresh >= 0 && algType.equalsIgnoreCase("nru")){

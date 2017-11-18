@@ -41,8 +41,6 @@ public class PTE {
 	return frameNumber;
     }
 
-    public int removePosit(){ return (futures.remove(0)); }
-
     public int peekPosit(){ return (futures.get(0)); }
 
     public int futureSize(){
@@ -75,7 +73,7 @@ public class PTE {
         return (futures.add(instructionIndex));
     }
 
-
+    public int removePosit(){ return (futures.remove(0)); }
 
 
 

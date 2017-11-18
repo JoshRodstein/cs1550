@@ -24,7 +24,7 @@ public class vmsim {
             switch(args[i]){
                 case "-n":
                     numFrames = Integer.valueOf(args[i+1]);
-                    if(numFrames < 8 || numFrames > 64 || numFrames % 8 != 0) {
+                    if(numFrames < 8 || numFrames % 8 != 0) {
                         System.err.print("Invalid frames parameter");
                         System.exit(0);
                     }
@@ -117,57 +117,66 @@ public class vmsim {
             int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
             currentEntry = pageTable.get(pageNum);
-
             memAccess++;
+
+            currentEntry.removePosit();
+
             if(currentEntry.isPresent() == false) {
+                System.out.print(" page fault -");
                 pageFaults++;
-                currentEntry.removePosit();
+
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
                     RAM[usedFrames].setFrameNumber(usedFrames);
                     RAM[usedFrames].setReferenced(true);
                     RAM[usedFrames].setPresent(true);
-                    if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
+                    if (accessType == 'W') {
+                        RAM[usedFrames].setDirty(true);
+                    }
                     usedFrames++;
+                    System.out.println(" no eviction");
                 } else {
-
+                    System.out.print(" evict");
                     int evictFrame = 0;
                     int curFarthest = 0;
 
-                    for(int i = 0; i < RAM.length; i++){
-                        if(RAM[i].futureSize() == 0) {
+                    for (int i = 0; i < RAM.length; i++) {
+                        if (RAM[i].futureSize() == 0) {
                             evictFrame = i;
                             break;
                         } else {
-                            if(RAM[i].peekPosit() > curFarthest){
+                            if (RAM[i].peekPosit() > curFarthest) {
                                 curFarthest = RAM[i].peekPosit();
                                 evictFrame = i;
                             }
                         }
                     }
 
-                    int evictIndex = RAM[evictFrame].getIndex();
-                    pageTable.get(evictIndex).setPresent(false);
-                    pageTable.get(evictIndex).setReferenced(false);
-                    pageTable.get(evictIndex).setFrameNumber(-1);
-
-                    if (pageTable.get(evictIndex).isDirty()) {
-                        pageTable.get(evictIndex).setDirty(false);
+                    RAM[evictFrame].setPresent(false);
+                    RAM[evictFrame].setReferenced(false);
+                    RAM[evictFrame].setFrameNumber(-1);
+                    if (RAM[evictFrame].isDirty()) {
+                        RAM[evictFrame].setDirty(false);
+                        System.out.println(" dirty");
                         wtd++;
+                    } else {
+                        System.out.println(" clean");
                     }
 
                     RAM[evictFrame] = currentEntry;
                     RAM[evictFrame].setFrameNumber(evictFrame);
                     RAM[evictFrame].setReferenced(true);
                     RAM[evictFrame].setPresent(true);
-                    if (accessType == 'W') { RAM[evictFrame].setDirty(true); }
+                    if (accessType == 'W') {
+                        RAM[evictFrame].setDirty(true);
+                    }
                 }
             } else {
+                System.out.println("hit");
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
                 RAM[currentEntry.getFrameNumber()].setReferenced(true);
-                RAM[currentEntry.getFrameNumber()].removePosit();
             }
         }
 
@@ -207,6 +216,7 @@ public class vmsim {
             memAccess++;
             if(currentEntry.isPresent() == false) {
                 pageFaults++;
+                System.out.print("page fault -");
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
                     RAM[usedFrames].setFrameNumber(usedFrames);
@@ -214,7 +224,9 @@ public class vmsim {
                     RAM[usedFrames].setPresent(true);
                     if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
                     usedFrames++;
+                    System.out.println(" no eviction");
                 } else {
+                    System.out.print(" evict");
                     int evictFrame;
                     while(true){
                         if(clockHand == 8){
@@ -237,7 +249,10 @@ public class vmsim {
 
                     if (pageTable.get(evictIndex).isDirty()) {
                         pageTable.get(evictIndex).setDirty(false);
+                        System.out.println(" dirty");
                         wtd++;
+                    } else {
+                        System.out.println(" clean");
                     }
 
                     RAM[evictFrame] = currentEntry;
@@ -247,6 +262,7 @@ public class vmsim {
                     if (accessType == 'W') { RAM[evictFrame].setDirty(true); }
                 }
             } else {
+                System.out.println("hit");
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
@@ -291,6 +307,7 @@ public class vmsim {
 
             memAccess++;
             if(currentEntry.isPresent() == false) {
+                System.out.print("page fault -");
                 pageFaults++;
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
@@ -299,7 +316,9 @@ public class vmsim {
                     RAM[usedFrames].setPresent(true);
                     if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
                     usedFrames++;
+                    System.out.println(" no eviction");
                 } else {
+                    System.out.print(" evict");
                     int lnec = -1;
 
                     for(int i = 0; i < 4; i++){
@@ -334,7 +353,10 @@ public class vmsim {
 
                     if (pageTable.get(RAM[evictFrame].getIndex()).isDirty()) {
                         pageTable.get(RAM[evictFrame].getIndex()).setDirty(false);
+                        System.out.println(" dirty");
                         wtd++;
+                    } else {
+                        System.out.println(" clean");
                     }
 
                     RAM[evictFrame] = currentEntry;
@@ -345,6 +367,7 @@ public class vmsim {
 
                 }
             } else {
+                System.out.println("hit");
                 if (accessType == 'W') {
                     currentEntry.setDirty(true);
                 }
@@ -394,7 +417,9 @@ public class vmsim {
             }
 
             memAccess++;
+            System.out.print(parseAddy);
             if(currentEntry.isPresent() == false) {
+                System.out.print(" page fault -");
                 pageFaults++;
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
@@ -403,7 +428,9 @@ public class vmsim {
                     RAM[usedFrames].setPresent(true);
                     if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
                     usedFrames++;
+                    System.out.println(" no eviction");
                 } else {
+                    System.out.print(" evict");
                     int randomFrame = rand.nextInt(noFrames);
                     int evictIndex = RAM[randomFrame].getIndex();
                     pageTable.get(evictIndex).setPresent(false);
@@ -412,20 +439,27 @@ public class vmsim {
 
                     if (pageTable.get(evictIndex).isDirty()) {
                         pageTable.get(evictIndex).setDirty(false);
+                        System.out.println(" dirty");
                         wtd++;
+                    } else {
+                        System.out.println(" clean");
                     }
 
                     RAM[randomFrame] = currentEntry;
                     RAM[randomFrame].setFrameNumber(randomFrame);
                     RAM[randomFrame].setReferenced(true);
                     RAM[randomFrame].setPresent(true);
-                    if (accessType == 'W') { RAM[randomFrame].setDirty(true); }
+                    if (accessType == 'W') {
+                        RAM[randomFrame].setDirty(true);
+                    }
+
                 }
             } else {
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
                 RAM[currentEntry.getFrameNumber()].setReferenced(true);
+                System.out.println("hit");
             }
         }
     }

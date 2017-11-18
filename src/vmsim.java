@@ -67,7 +67,111 @@ public class vmsim {
 
     }
 
-    public static void sim_optimum(int nofFrames, File traceFile){}
+    public static void sim_optimum(int noFrames, File traceFile){
+        int clock = 0;
+        int usedFrames = 0;
+        Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
+        PTE[] RAM = new PTE[noFrames];
+        Random rand = new Random();
+        Scanner scan;
+
+        try {
+            scan = new Scanner(traceFile);
+        } catch(FileNotFoundException fn) {
+            System.out.println("File not found");
+            return;
+        }
+
+        while(scan.hasNextLine()){
+            clock++;
+            String trace = scan.nextLine();
+            String parseAddy = "0x" + trace.substring(0, 8);
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
+
+            if (pageTable.containsKey(pageNum) == false) {
+                PTE newEntry = new PTE();
+                newEntry.setIndex(pageNum);
+                pageTable.put(pageNum, newEntry);
+            }
+
+            pageTable.get(pageNum).pushPosit(clock);
+        }
+
+        System.out.println("Clock Cycles: " + clock);
+        //System.exit(0);
+
+        try {
+            scan = new Scanner(traceFile);
+        } catch(FileNotFoundException fn) {
+            System.out.println("File not found");
+            return;
+        }
+
+        PTE currentEntry;
+        while(scan.hasNextLine()){
+            String trace = scan.nextLine();
+            char accessType = trace.charAt(9);
+            String parseAddy = "0x" + trace.substring(0, 8);
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
+
+            currentEntry = pageTable.get(pageNum);
+
+            memAccess++;
+            if(currentEntry.isPresent() == false) {
+                pageFaults++;
+                currentEntry.removePosit();
+                if (usedFrames < noFrames) {
+                    RAM[usedFrames] = currentEntry;
+                    RAM[usedFrames].setFrameNumber(usedFrames);
+                    RAM[usedFrames].setReferenced(true);
+                    RAM[usedFrames].setPresent(true);
+                    if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
+                    usedFrames++;
+                } else {
+
+                    int evictFrame = 0;
+                    int curFarthest = 0;
+
+                    for(int i = 0; i < RAM.length; i++){
+                        if(RAM[i].futureSize() == 0) {
+                            evictFrame = i;
+                            break;
+                        } else {
+                            if(RAM[i].peekPosit() > curFarthest){
+                                curFarthest = RAM[i].peekPosit();
+                                evictFrame = i;
+                            }
+                        }
+                    }
+
+                    int evictIndex = RAM[evictFrame].getIndex();
+                    pageTable.get(evictIndex).setPresent(false);
+                    pageTable.get(evictIndex).setReferenced(false);
+                    pageTable.get(evictIndex).setFrameNumber(-1);
+
+                    if (pageTable.get(evictIndex).isDirty()) {
+                        pageTable.get(evictIndex).setDirty(false);
+                        wtd++;
+                    }
+
+                    RAM[evictFrame] = currentEntry;
+                    RAM[evictFrame].setFrameNumber(evictFrame);
+                    RAM[evictFrame].setReferenced(true);
+                    RAM[evictFrame].setPresent(true);
+                    if (accessType == 'W') { RAM[evictFrame].setDirty(true); }
+                }
+            } else {
+                if (accessType == 'W') {
+                    RAM[currentEntry.getFrameNumber()].setDirty(true);
+                }
+                RAM[currentEntry.getFrameNumber()].setReferenced(true);
+                RAM[currentEntry.getFrameNumber()].removePosit();
+            }
+        }
+
+    }
     public static void sim_clock(int noFrames, File traceFile){
         int usedFrames = 0;
         Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
@@ -117,7 +221,6 @@ public class vmsim {
                             clockHand = 0;
                         }
                         if(RAM[clockHand].isReferenced() == false){
-                            RAM[clockHand].setReferenced(true);
                             evictFrame = clockHand;
                             clockHand++;
                             break;
@@ -304,6 +407,7 @@ public class vmsim {
                     int randomFrame = rand.nextInt(noFrames);
                     int evictIndex = RAM[randomFrame].getIndex();
                     pageTable.get(evictIndex).setPresent(false);
+                    pageTable.get(evictIndex).setReferenced(false);
                     pageTable.get(evictIndex).setFrameNumber(-1);
 
                     if (pageTable.get(evictIndex).isDirty()) {

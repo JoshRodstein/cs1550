@@ -311,6 +311,7 @@ public class vmsim {
             }
         }
     }
+    // simulate not recently used algorithm
     public static void sim_nru(int noFrames, int refresh, File traceFile){
         int usedFrames = 0;
         Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
@@ -327,6 +328,7 @@ public class vmsim {
         }
 
         PTE currentEntry;
+	// Array of LinkedLists holds 4 classes of referenced/dirty bit permuations
         LinkedList<Integer>[] nruClass = new LinkedList[4];
 
         while(scan.hasNextLine()){
@@ -359,12 +361,15 @@ public class vmsim {
                     System.out.println(" no eviction");
                 } else {
                     System.out.print(" evict");
+		    //lnec: holds lowest none empty class index
                     int lnec = -1;
 
                     for(int i = 0; i < 4; i++){
                         nruClass[i] = new LinkedList<Integer>();
                     }
-
+		    /* If eviction is needed, iterate over Frames in RAM
+		     organizing by perm of referenced and dirty bit values
+		     placing index into corresponding nruClass LinkedList */
                     for(int i = 0; i < RAM.length; i++){
                         if(RAM[i].isReferenced() == false && RAM[i].isDirty() == false){
                             nruClass[0].push(i);
@@ -377,6 +382,7 @@ public class vmsim {
                         }
                     }
 
+		    // store lowest none empty class index
                     for(int i = 0; i < nruClass.length; i++) {
                         if (nruClass[i].size() > 0) {
                             lnec = i;
@@ -384,7 +390,7 @@ public class vmsim {
                         }
                     }
 
-
+		    // pick a random index from lowest none empty class to evict
                     int randomFrame = rand.nextInt(nruClass[lnec].size());
                     int evictFrame = nruClass[lnec].get(randomFrame);
                     pageTable.get(RAM[evictFrame].getIndex()).setPresent(false);
@@ -399,6 +405,7 @@ public class vmsim {
 			System.out.println(" clean");
                     }
 
+		    // place current page into newly freed frame
                     RAM[evictFrame] = currentEntry;
                     currentEntry.setFrameNumber(evictFrame);
                     currentEntry.setReferenced(true);
@@ -428,6 +435,7 @@ public class vmsim {
 	    
 	}
     }
+    // simulate random algorithm
     public static void sim_random(int noFrames, File traceFile){
         int usedFrames = 0;
 	    Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
@@ -474,6 +482,7 @@ public class vmsim {
                     System.out.println(" no eviction");
                 } else {
 		    System.out.print(" evict");
+		    // evict random frame from RAM
                     int randomFrame = rand.nextInt(noFrames);
                     int evictIndex = RAM[randomFrame].getIndex();
                     pageTable.get(evictIndex).setPresent(false);
@@ -506,7 +515,8 @@ public class vmsim {
             }
         }
     }
-
+    
+    // print end of program statistics
     public static void printResults(String algType, int numFrames, int refresh,
                                     int memAccess, int pageFaults, int wtd){
         System.out.println("Algorithm: " + algType);

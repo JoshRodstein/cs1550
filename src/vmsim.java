@@ -519,6 +519,7 @@ public class vmsim {
     // print end of program statistics
     public static void printResults(String algType, int numFrames, int refresh,
                                     int memAccess, int pageFaults, int wtd){
+	System.out.println();
         System.out.println("Algorithm: " + algType);
         System.out.println("Number of frames: " + numFrames);
         if(refresh >= 0 && algType.equalsIgnoreCase("nru")){

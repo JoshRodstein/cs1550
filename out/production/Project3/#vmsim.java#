@@ -1,22 +1,7 @@
-/*****************************************************************************
- * cs1550 - Project 3 - Virtual Memory                                       *
- * Joshua Rodstein / jor94@pitt.edu                                          *
- *                                                                           *
- * Description: Simulate 4 Page Replacement ALgorithms                       *   
- *    Random, NRU, Clock, Optimum                                            *
- *                                                                           *
- * ./vmsim –n numframes -a <opt|clock|nru|rand> [-r refresh] tracefile       *
- *                                                                           *
- * Note: for Random, Clock, and Optimum, Refresh parameter will be ignored   * 
- *****************************************************************************/
-
-
-
 import java.io.*;
 import java.util.*;
 
 public class vmsim {
-    // variables for stats output
     public static int memAccess;
     public static int pageFaults;
     public static int wtd;
@@ -34,7 +19,6 @@ public class vmsim {
         int refresh = -1;
         File traceFile = null;
 
-	// Flag argument parsing
         for(int i = 0; i < args.length; i++){
 
             switch(args[i]){
@@ -49,15 +33,7 @@ public class vmsim {
                     algType = args[i+1];
                     continue;
                 case "-r":
-		    try {
-			refresh = Integer.parseInt(args[i+1]);
-		    } catch(NumberFormatException nf){
-			System.out.println("Error: invalid refresh rate");
-			System.exit(0);
-		    } catch(ArrayIndexOutOfBoundsException ai){
-			System.out.println("Error: invalid refresh rate");
-			System.exit(0);
-		    }
+                    refresh = Integer.parseInt(args[i+1]);
                     continue;
                 default: break;
             }
@@ -68,7 +44,6 @@ public class vmsim {
 
         }
 
-	// Execute/verify specified algorithm
         if(algType.equalsIgnoreCase("opt")){
             sim_optimum(numFrames, traceFile);
             printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
@@ -78,7 +53,7 @@ public class vmsim {
         } else if(algType.equalsIgnoreCase("nru")){
             sim_nru(numFrames, refresh, traceFile);
             printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
-        } else if(algType.equalsIgnoreCase("random") || algType.equalsIgnoreCase("rand")){
+        } else if(algType.equalsIgnoreCase("random")){
             sim_random(numFrames, traceFile);
             printResults(algType, numFrames, refresh, memAccess, pageFaults, wtd);
         } else {
@@ -89,10 +64,8 @@ public class vmsim {
 
     }
 
-    // Simulate optimum algorithm
     public static void sim_optimum(int noFrames, File traceFile){
-	/* 'clock' variable simulates clock ticks and keeps track of instruction index */
-	int clock = 0;  
+        int clock = 0;
         int usedFrames = 0;
         Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
         PTE[] RAM = new PTE[noFrames];
@@ -102,28 +75,28 @@ public class vmsim {
         try {
             scan = new Scanner(traceFile);
         } catch(FileNotFoundException fn) {
-            System.out.println("Error: File not found");
-	    System.exit(0);
+            System.out.println("File not found");
             return;
         }
 
         while(scan.hasNextLine()){
-	    // simulate rising edge by incrementing clock upon instruction read 
             clock++;
-            String trace = scan.nextLine();
-            String parseAddy = "0x" + trace.substring(0, 5);
-            int pageNum = Integer.decode(parseAddy);
+            String trace = scan.nextLine().split(" ");
+            String parseAddy = trace[0].subString(0,8);
+            //int intAddy = Long.decode(parseAddy);
+            int pageNum = Integer.decode("0x" + intAddy/(int)Math.pow(2,12));
 
-	    // Pre-Process instructions, load page table
             if (pageTable.containsKey(pageNum) == false) {
                 PTE newEntry = new PTE();
                 newEntry.setIndex(pageNum);
                 pageTable.put(pageNum, newEntry);
             }
 
-	    // store instruction index in PTE contained linked list
             pageTable.get(pageNum).pushPosit(clock);
         }
+
+        //System.out.println("Clock Cycles: " + clock);
+        //System.exit(0);
 
         try {
             scan = new Scanner(traceFile);
@@ -131,25 +104,24 @@ public class vmsim {
             System.out.println("File not found");
             return;
         }
-	
+
         PTE currentEntry;
         while(scan.hasNextLine()){
             String trace = scan.nextLine();
             char accessType = trace.charAt(9);
-	    String parseAddy = "0x" + trace.substring(0, 8);
-            int pageNum = Integer.decode(parseAddy.substring(0,7));
+            String parseAddy = "0x" + trace.substring(0, 8);
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
             currentEntry = pageTable.get(pageNum);
+            memAccess++;
+
             currentEntry.removePosit();
-	    
-	    memAccess++;
-	    System.out.print(parseAddy + " ");
+
             if(currentEntry.isPresent() == false) {
-		// If we are here, page not in RAM
-                System.out.print("page fault -");
+                //System.out.print(" page fault -");
                 pageFaults++;
 
-		// If space, load page into 1st available frame
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
                     RAM[usedFrames].setFrameNumber(usedFrames);
@@ -159,15 +131,12 @@ public class vmsim {
                         RAM[usedFrames].setDirty(true);
                     }
                     usedFrames++;
-                    System.out.println(" no eviction");
+                    //System.out.println(" no eviction");
                 } else {
-		    // if we are here, no space in RAM
-                    System.out.print(" evict");
+                    //System.out.print(" evict");
                     int evictFrame = 0;
                     int curFarthest = 0;
 
-		    /* Iterate over position list of each PTE in every Frame
-		       Compare and evict the Page with the furthest instruction */ 
                     for (int i = 0; i < RAM.length; i++) {
                         if (RAM[i].futureSize() == 0) {
                             evictFrame = i;
@@ -180,18 +149,17 @@ public class vmsim {
                         }
                     }
 
-		    // Eviction, if Page is dirty write to disk and clean
                     RAM[evictFrame].setPresent(false);
                     RAM[evictFrame].setReferenced(false);
                     RAM[evictFrame].setFrameNumber(-1);
                     if (RAM[evictFrame].isDirty()) {
                         RAM[evictFrame].setDirty(false);
-                        System.out.println(" dirty");
+                        //System.out.println(" dirty");
                         wtd++;
                     } else {
-		        System.out.println(" clean");
+			//      System.out.println(" clean");
                     }
-		    // insert current page into newly freed frame
+
                     RAM[evictFrame] = currentEntry;
                     RAM[evictFrame].setFrameNumber(evictFrame);
                     RAM[evictFrame].setReferenced(true);
@@ -201,8 +169,7 @@ public class vmsim {
                     }
                 }
             } else {
-		// if we are here, page is in RAM and valid
-                System.out.println("hit");
+                //System.out.println("hit");
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
@@ -211,20 +178,18 @@ public class vmsim {
         }
 
     }
-    // Simulate clock algorithm
     public static void sim_clock(int noFrames, File traceFile){
         int usedFrames = 0;
         Hashtable<Integer, PTE> pageTable = new Hashtable<Integer, PTE>();
         PTE[] RAM = new PTE[noFrames];
+        Random rand = new Random();
         Scanner scan;
-	// clock hand points to current oldest frame in RAM
         int clockHand = 0;
 
         try {
             scan = new Scanner(traceFile);
         } catch(FileNotFoundException fn) {
-            System.out.println("Error: File not found");
-	    System.exit(0);
+            System.out.println("File not found");
             return;
         }
 
@@ -232,10 +197,10 @@ public class vmsim {
         while(scan.hasNextLine()){
             String trace = scan.nextLine();
             char accessType = trace.charAt(9);
-	    String parseAddy = "0x" + trace.substring(0, 8);
-            int pageNum = Integer.decode(parseAddy.substring(0,7));
+            String parseAddy = "0x" + trace.substring(0,8);
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
-	    // Dyamically Load PageTable
             if (pageTable.containsKey(pageNum) == false) {
                 PTE newEntry = new PTE();
                 newEntry.setIndex(pageNum);
@@ -246,11 +211,9 @@ public class vmsim {
             }
 
             memAccess++;
-	    System.out.print(parseAddy + " ");
             if(currentEntry.isPresent() == false) {
-		// if we are, page is not in RAM
                 pageFaults++;
-                System.out.print("page fault -");
+                //System.out.print("page fault -");
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
                     RAM[usedFrames].setFrameNumber(usedFrames);
@@ -258,17 +221,12 @@ public class vmsim {
                     RAM[usedFrames].setPresent(true);
                     if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
                     usedFrames++;
-                    System.out.println(" no eviction");
+                    //System.out.println(" no eviction");
                 } else {
-		    // if we are here, no available Frame in RAM
-		    System.out.print(" evict");
-
-		    /* Search for oldest NOT-referenced page by examining
-		       frame pointed to by clock hand. Simulates circular
-		       queue. */
+		    // System.out.print(" evict");
                     int evictFrame;
                     while(true){
-                        if(clockHand == noFrames){
+                        if(clockHand == 8){
                             clockHand = 0;
                         }
                         if(RAM[clockHand].isReferenced() == false){
@@ -281,20 +239,19 @@ public class vmsim {
                         }
                     }
 
-		    // evict frame found in previous iteration
-                    RAM[evictFrame].setPresent(false);
-                    RAM[evictFrame].setReferenced(false);
-                    RAM[evictFrame].setFrameNumber(-1);
+                    int evictIndex = RAM[evictFrame].getIndex();
+                    pageTable.get(evictIndex).setPresent(false);
+                    pageTable.get(RAM[evictFrame].getIndex()).setReferenced(false);
+                    pageTable.get(evictIndex).setFrameNumber(-1);
 
-                    if (RAM[evictFrame].isDirty()) {
-                        RAM[evictFrame].setDirty(false);
-                        System.out.println(" dirty");
+                    if (pageTable.get(evictIndex).isDirty()) {
+                        pageTable.get(evictIndex).setDirty(false);
+                        //System.out.println(" dirty");
                         wtd++;
                     } else {
-			System.out.println(" clean");
+			//      System.out.println(" clean");
                     }
 
-		    // place current page into newly freed frame
                     RAM[evictFrame] = currentEntry;
                     RAM[evictFrame].setFrameNumber(evictFrame);
                     RAM[evictFrame].setReferenced(true);
@@ -302,8 +259,7 @@ public class vmsim {
                     if (accessType == 'W') { RAM[evictFrame].setDirty(true); }
                 }
             } else {
-		// If we are here, page is valid / exists in RAM
-		System.out.println("hit");
+		//  System.out.println("hit");
                 if (accessType == 'W') {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
@@ -321,8 +277,7 @@ public class vmsim {
         try {
             scan = new Scanner(traceFile);
         } catch(FileNotFoundException fn) {
-            System.out.println("Error: File not found");
-	    System.exit(0);
+            System.out.println("File not found");
             return;
         }
 
@@ -333,7 +288,10 @@ public class vmsim {
             String trace = scan.nextLine();
             char accessType = trace.charAt(9);
             String parseAddy = "0x" + trace.substring(0, 8);
-            int pageNum = Integer.decode(parseAddy.substring(0,7));
+            long intAddy = Long.decode(parseAddy);
+            int pageNum = (int)intAddy/(int)Math.pow(2,12);
+
+
 
             if (pageTable.containsKey(pageNum) == false) {
                 PTE newEntry = new PTE();
@@ -345,9 +303,8 @@ public class vmsim {
             }
 
             memAccess++;
-	    System.out.print(parseAddy + " ");
             if(currentEntry.isPresent() == false) {
-                System.out.print("page fault -");
+                //System.out.print("page fault -");
                 pageFaults++;
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
@@ -356,9 +313,9 @@ public class vmsim {
                     RAM[usedFrames].setPresent(true);
                     if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
                     usedFrames++;
-                    System.out.println(" no eviction");
+                    //System.out.println(" no eviction");
                 } else {
-                    System.out.print(" evict");
+                    //System.out.print(" evict");
                     int lnec = -1;
 
                     for(int i = 0; i < 4; i++){
@@ -393,10 +350,10 @@ public class vmsim {
 
                     if (pageTable.get(RAM[evictFrame].getIndex()).isDirty()) {
                         pageTable.get(RAM[evictFrame].getIndex()).setDirty(false);
-                        System.out.println(" dirty");
+                        //System.out.println(" dirty");
                         wtd++;
                     } else {
-			System.out.println(" clean");
+			//      System.out.println(" clean");
                     }
 
                     RAM[evictFrame] = currentEntry;
@@ -407,26 +364,23 @@ public class vmsim {
 
                 }
             } else {
-                System.out.println("hit");
+                //System.out.println("hit");
                 if (accessType == 'W') {
                     currentEntry.setDirty(true);
                 }
                 RAM[currentEntry.getFrameNumber()].setReferenced(true);
             }
 
-	    if(refresh == 0) {
-		continue;
-	    }
-	    if(memAccess % refresh == 0){
-		for(int i = 0; i < usedFrames; i++){
-		    if(RAM[i].isReferenced()) {
-			RAM[i].setReferenced(false);
-		    }
-		}
 
-	    }
-	    
-	}
+            if(memAccess % refresh == 0){
+                for(int i = 0; i < usedFrames; i++){
+                    if(RAM[i].isReferenced()) {
+                        RAM[i].setReferenced(false);
+                    }
+                }
+
+            }
+        }
     }
     public static void sim_random(int noFrames, File traceFile){
         int usedFrames = 0;
@@ -438,17 +392,17 @@ public class vmsim {
 	    try {
 	        scan = new Scanner(traceFile);
 	    } catch(FileNotFoundException fn) {
-	        System.out.println("Error: File not found");
-		System.exit(0);
+	        System.out.println("File not found");
 	        return;
 	    }
 
         PTE currentEntry;
 	    while(scan.hasNextLine()){
-            String trace = scan.nextLine();
-            char accessType = trace.charAt(9);
-            String parseAddy = "0x" + trace.substring(0, 8);
-            int pageNum = Integer.decode(parseAddy.substring(0,7));
+		String trace = scan.nextLine();
+		char accessType = trace.charAt(9);
+		String parseAddy = "0x" + trace.substring(0, 8);
+		long intAddy = Long.decode(parseAddy);
+		int pageNum = (int)intAddy/(int)Math.pow(2,12);
 
             if (pageTable.containsKey(pageNum) == false) {
                 PTE newEntry = new PTE();
@@ -460,9 +414,9 @@ public class vmsim {
             }
 
             memAccess++;
-            System.out.print(parseAddy + " ");
+            //System.out.print(parseAddy + " ");
             if(currentEntry.isPresent() == false) {
-                System.out.print("page fault -");
+                //System.out.print(" page fault -");
                 pageFaults++;
                 if (usedFrames < noFrames) {
                     RAM[usedFrames] = currentEntry;
@@ -471,9 +425,9 @@ public class vmsim {
                     RAM[usedFrames].setPresent(true);
                     if (accessType == 'W') { RAM[usedFrames].setDirty(true); }
                     usedFrames++;
-                    System.out.println(" no eviction");
+                    //System.out.println(" no eviction");
                 } else {
-		    System.out.print(" evict");
+		    //System.out.print(" evict");
                     int randomFrame = rand.nextInt(noFrames);
                     int evictIndex = RAM[randomFrame].getIndex();
                     pageTable.get(evictIndex).setPresent(false);
@@ -482,10 +436,10 @@ public class vmsim {
 
                     if (pageTable.get(evictIndex).isDirty()) {
                         pageTable.get(evictIndex).setDirty(false);
-                        System.out.println(" dirty");
+                        //System.out.println(" dirty");
                         wtd++;
                     } else {
-			System.out.println(" clean");
+			//	System.out.println(" clean");
                     }
 
                     RAM[randomFrame] = currentEntry;
@@ -502,7 +456,7 @@ public class vmsim {
                     RAM[currentEntry.getFrameNumber()].setDirty(true);
                 }
                 RAM[currentEntry.getFrameNumber()].setReferenced(true);
-                System.out.println("hit");
+                //System.out.println("hit");
             }
         }
     }

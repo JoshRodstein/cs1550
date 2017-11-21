@@ -1,0 +1,20 @@
+Algorithm: clock
+Number of frames: 8
+Total memory accesses: 1000000
+Total memory page faults: 181856
+Total writes to disk: 29401
+Algorithm: clock
+Number of frames: 16
+Total memory accesses: 1000000
+Total memory page faults: 175389
+Total writes to disk: 26684
+Algorithm: clock
+Number of frames: 32
+Total memory accesses: 1000000
+Total memory page faults: 161805
+Total writes to disk: 22637
+Algorithm: clock
+Number of frames: 64
+Total memory accesses: 1000000
+Total memory page faults: 146097
+Total writes to disk: 15279

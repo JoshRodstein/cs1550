@@ -1,0 +1,24 @@
+Algorithm: nru
+Number of frames: 8
+Refresh rate: 50
+Total memory accesses: 1000000
+Total memory page faults: 182193
+Total writes to disk: 18844
+Algorithm: nru
+Number of frames: 16
+Refresh rate: 50
+Total memory accesses: 1000000
+Total memory page faults: 125862
+Total writes to disk: 12375
+Algorithm: nru
+Number of frames: 32
+Refresh rate: 50
+Total memory accesses: 1000000
+Total memory page faults: 109168
+Total writes to disk: 7808
+Algorithm: nru
+Number of frames: 64
+Refresh rate: 50
+Total memory accesses: 1000000
+Total memory page faults: 96946
+Total writes to disk: 4987

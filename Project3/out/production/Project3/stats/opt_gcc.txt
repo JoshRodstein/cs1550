@@ -1,0 +1,20 @@
+Algorithm: opt
+Number of frames: 8
+Total memory accesses: 1000000
+Total memory page faults: 118490
+Total writes to disk: 15031
+Algorithm: opt
+Number of frames: 16
+Total memory accesses: 1000000
+Total memory page faults: 80332
+Total writes to disk: 11314
+Algorithm: opt
+Number of frames: 32
+Total memory accesses: 1000000
+Total memory page faults: 55848
+Total writes to disk: 8275
+Algorithm: opt
+Number of frames: 64
+Total memory accesses: 1000000
+Total memory page faults: 38100
+Total writes to disk: 5729

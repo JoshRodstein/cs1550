@@ -1,0 +1,20 @@
+Algorithm: random
+Number of frames: 8
+Total memory accesses: 1000000
+Total memory page faults: 216913
+Total writes to disk: 37383
+Algorithm: random
+Number of frames: 16
+Total memory accesses: 1000000
+Total memory page faults: 150322
+Total writes to disk: 24792
+Algorithm: random
+Number of frames: 32
+Total memory accesses: 1000000
+Total memory page faults: 106770
+Total writes to disk: 17333
+Algorithm: random
+Number of frames: 64
+Total memory accesses: 1000000
+Total memory page faults: 75309
+Total writes to disk: 12250
